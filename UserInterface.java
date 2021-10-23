@@ -48,18 +48,21 @@ public class UserInterface extends JFrame {
                 line = reader.readLine();
             }
         } catch (IOException x) {
+            jTextArea2.setText("~Error: Voters Database Not Found~\n");
             System.err.println(x);
         }
         
         for (int i = 0; i < initialFirstNames.size(); i++) {
             profile.AddVote(initialFirstNames.get(i), initialLastNames.get(i), initialPartyNames.get(i), i);
         }
-        profile.UpdateTexts();
+        profile.UpdateTexts(false);
     }
     
-    private void UpdateTexts() {
+    private void UpdateTexts(boolean wipe) {
+        if (wipe) {
+            jTextArea2.setText("");
+        }
         jTextArea1.setText("");
-        jTextArea2.setText("");
         
         jLabel2.setText("Filtered List of Voters");
         for (String vote : votersList) {
@@ -99,6 +102,9 @@ public class UserInterface extends JFrame {
             firstName.add(newName);
             lastName.add(newSurName);
             partyName.add(newPartyName);
+            initialFirstNames.add(newName);
+            initialLastNames.add(newSurName);
+            initialPartyNames.add(newPartyName);
             votersList.add((votersList.size() + 1) + ". " + newName + " " + newSurName + " (" + newPartyName + ")\n");
         } else {
             return false;
@@ -311,19 +317,13 @@ public class UserInterface extends JFrame {
         boolean temp = false;
         if (party.replaceAll("\\s","").equals("")) {
             temp = true;
-        } else {
-            for (String vote : firstName) {
-                if (name.equals(vote) && surName.equals(lastName.get(firstName.indexOf(vote)))) {
-                    temp = true;
-                }
-            }
-        }
+        } 
         
         if (!name.equals("") && !surName.equals("") && !party.equals("") && !temp) {
             temp = profile.AddVote(name, surName, party, -1);
             if (temp) {
                 jErrorMessageText.setText("(Vote added succesfully)");
-                profile.UpdateTexts();
+                profile.UpdateTexts(true);
             } else {
                 jErrorMessageText.setText("(Error - vote could not be added)");
             }

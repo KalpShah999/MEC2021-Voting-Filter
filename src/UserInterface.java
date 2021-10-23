@@ -77,12 +77,13 @@ public class UserInterface extends JFrame {
         boolean temp1 = false;
         if (partyName.contains(",")) {
             temp1 = true;
-        } 
-        
-        for (int i = 0; i < initialFirstNames.size(); i++) {
-            if (i != index) {
-                if (newName.equals(initialFirstNames.get(i)) && newSurName.equals(initialLastNames.get(i))) {
-                    temp1 = true;
+        } else {
+            for (int i = 0; i < initialFirstNames.size(); i++) {
+                if (i != index) {
+                    if (newName.equals(initialFirstNames.get(i)) && newSurName.equals(initialLastNames.get(i))) {
+                        temp1 = true;
+                        break;
+                    }
                 }
             }
         }

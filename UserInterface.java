@@ -1,0 +1,365 @@
+import java.awt.*;
+import javax.swing.*;
+import java.util.ArrayList;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+
+public class UserInterface extends JFrame {
+
+    static UserInterface profile = new UserInterface();
+    
+    private ArrayList<String> firstName = new ArrayList();
+    private ArrayList<String> lastName = new ArrayList();
+    private ArrayList<String> partyName = new ArrayList();
+    private ArrayList<String> votersList = new ArrayList();
+    
+    private int party1Count = 0; //Pineapple Pizza Party
+    private int party2Count = 0; //Socks and Crocs Reform League
+    private int party3Count = 0; //Pronounced Jiff Union
+    
+    private void ReadData() {
+        //https://docs.oracle.com/javase/tutorial/essential/io/index.html
+        String userDirectory = System.getProperty("user.dir");
+        Path file = Paths.get(userDirectory + "/data/MEC_Competition_Voting_Data.csv");
+        
+        try (InputStream in = Files.newInputStream(file);
+                BufferedReader reader
+                = new BufferedReader(new InputStreamReader(in))) {
+            String line;
+            while ((line = reader.readLine()) != null && (line = reader.readLine()) != "First Name, Last Name, Vote") {
+                String[] Vote = line.split(",");
+                if (Vote.length == 3) {
+                    if (Vote[2].equals("Pineapple Pizza Party")) {
+                        party1Count++;
+                        firstName.add(Vote[0]);
+                        lastName.add(Vote[1]);
+                        partyName.add(Vote[2]);
+                        votersList.add((votersList.size() + 1) + ". " + Vote[0] + " " + Vote[1] + " (" + Vote[2] + ")\n");
+                    } else if (Vote[2].equals("Socks and Crocs Reform League")) {
+                        party2Count++;
+                        firstName.add(Vote[0]);
+                        lastName.add(Vote[1]);
+                        partyName.add(Vote[2]);
+                        votersList.add((votersList.size() + 1) + ". " + Vote[0] + " " + Vote[1] + " (" + Vote[2] + ")\n");
+                    } else if (Vote[2].equals("Pronounced Jiff Union")) {
+                        party3Count++;
+                        firstName.add(Vote[0]);
+                        lastName.add(Vote[1]);
+                        partyName.add(Vote[2]);
+                        votersList.add((votersList.size() + 1) + ". " + Vote[0] + " " + Vote[1] + " (" + Vote[2] + ")\n");
+                    }
+                }
+            }
+        } catch (IOException x) {
+            System.err.println(x);
+        }
+        profile.UpdateTexts();
+    }
+    
+    private void UpdateTexts() {
+        jLabel2.setText("Filtered List of Voters");
+        for (String vote : votersList) {
+            jTextArea2.append(vote);
+        }
+        
+        if (party1Count > party2Count && party1Count > party3Count) {
+            jStandingsPosition1.setText("Pineapple Pizza Party: " + party1Count);
+            if (party2Count > party3Count) {
+                jStandingsPosition2.setText("Socks and Crocs Reform League: " + party2Count);
+                jStandingsPosition3.setText("Pronounced Jiff Union: " + party3Count);
+            } else {
+                jStandingsPosition2.setText("Pronounced Jiff Union: " + party3Count);
+                jStandingsPosition3.setText("Socks and Crocs Reform League: " + party2Count);
+            }
+        } else if (party2Count > party3Count) {
+            jStandingsPosition1.setText("Socks and Crocs Reform League: " + party2Count);
+            if (party1Count > party3Count) {
+                jStandingsPosition2.setText("Pineapple Pizza Party: " + party1Count);
+                jStandingsPosition3.setText("Pronounced Jiff Union: " + party3Count);
+            } else {
+                jStandingsPosition2.setText("Pronounced Jiff Union: " + party3Count);
+                jStandingsPosition3.setText("Pineapple Pizza Party: " + party1Count);
+            }
+        } else {
+            jStandingsPosition1.setText("Pronounced Jiff Union: " + party3Count);
+            if (party1Count > party2Count) {
+                jStandingsPosition2.setText("Pineapple Pizza Party: " + party1Count);
+                jStandingsPosition3.setText("Socks and Crocs Reform League: " + party2Count);
+            } else {
+                jStandingsPosition2.setText("Socks and Crocs Reform League: " + party2Count);
+                jStandingsPosition3.setText("Pineapple Pizza Party: " + party1Count);
+            }
+        }
+    }  
+    
+    public UserInterface() {
+        initComponents();
+    }
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        buttonGroup1 = new javax.swing.ButtonGroup();
+        label1 = new java.awt.Label();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jTextArea2 = new javax.swing.JTextArea();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        jStandingsPosition1 = new javax.swing.JLabel();
+        jStandingsPosition2 = new javax.swing.JLabel();
+        jStandingsPosition3 = new javax.swing.JLabel();
+        jAddButton = new javax.swing.JButton();
+        jAddTextField1 = new javax.swing.JTextField();
+        jAddText1 = new javax.swing.JLabel();
+        jAddText2 = new javax.swing.JLabel();
+        jAddTextField2 = new javax.swing.JTextField();
+        jRadioButton1 = new javax.swing.JRadioButton();
+        jAddText3 = new javax.swing.JLabel();
+        jRadioButton2 = new javax.swing.JRadioButton();
+        jRadioButton3 = new javax.swing.JRadioButton();
+        jCreateVoteText = new javax.swing.JLabel();
+        jErrorMessageText = new javax.swing.JLabel();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setResizable(false);
+
+        label1.setFont(new java.awt.Font("Lucida Grande", 0, 36)); // NOI18N
+        label1.setText("Voter's Filter");
+
+        jTextArea2.setEditable(false);
+        jTextArea2.setColumns(20);
+        jTextArea2.setRows(5);
+        jScrollPane2.setViewportView(jTextArea2);
+
+        jLabel2.setFont(new java.awt.Font("Lucida Grande", 0, 18)); // NOI18N
+        jLabel2.setText("Filtered List of Voters (Total Number of Votes: 0)");
+
+        jLabel3.setFont(new java.awt.Font("Lucida Grande", 0, 18)); // NOI18N
+        jLabel3.setText("Current Elections Standings:");
+
+        jStandingsPosition1.setFont(new java.awt.Font("Lucida Grande", 1, 13)); // NOI18N
+        jStandingsPosition1.setText("[Party Name]: [Vote Count]");
+
+        jStandingsPosition2.setText("[Party Name]: [Vote Count]");
+
+        jStandingsPosition3.setText("[Party Name]: [Vote Count]");
+
+        jAddButton.setText("Add Vote");
+        jAddButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jAddButtonActionPerformed(evt);
+            }
+        });
+
+        jAddText1.setText("First Name:");
+
+        jAddText2.setText("Last Name:");
+
+        buttonGroup1.add(jRadioButton1);
+        jRadioButton1.setText("Pineapple Pizza Party");
+
+        jAddText3.setText("Choose Election Party:");
+
+        buttonGroup1.add(jRadioButton2);
+        jRadioButton2.setText("Socks and Crocs Reform League");
+
+        buttonGroup1.add(jRadioButton3);
+        jRadioButton3.setText("Pronounced Jiff Union");
+
+        jCreateVoteText.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
+        jCreateVoteText.setText("Create New Vote:");
+
+        jErrorMessageText.setFont(new java.awt.Font("Lucida Grande", 0, 10)); // NOI18N
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(label1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(11, 11, 11)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jAddText1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jAddTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jAddText2)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jAddTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jAddText3)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jRadioButton1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jRadioButton2)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jRadioButton3))
+                            .addComponent(jLabel3)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jAddButton)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jErrorMessageText))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(6, 6, 6)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jStandingsPosition2)
+                                    .addComponent(jStandingsPosition1)
+                                    .addComponent(jStandingsPosition3)))
+                            .addComponent(jCreateVoteText)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(10, 10, 10)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel2)
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 500, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(21, Short.MAX_VALUE))
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(label1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jCreateVoteText)
+                .addGap(9, 9, 9)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jAddTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jAddText1)
+                    .addComponent(jAddText2)
+                    .addComponent(jAddTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jRadioButton1)
+                    .addComponent(jAddText3)
+                    .addComponent(jRadioButton2)
+                    .addComponent(jRadioButton3))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jAddButton)
+                    .addComponent(jErrorMessageText))
+                .addGap(24, 24, 24)
+                .addComponent(jLabel3)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jStandingsPosition1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jStandingsPosition2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jStandingsPosition3)
+                .addContainerGap(27, Short.MAX_VALUE))
+        );
+
+        label1.getAccessibleContext().setAccessibleName("title1");
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void jAddButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jAddButtonActionPerformed
+        String name = jAddTextField1.getText().replaceAll("\\s","");
+        String surName = jAddTextField2.getText().replaceAll("\\s","");
+        String party = "";
+        if (jRadioButton1.isSelected()) {
+            party = "Pineapple Pizza Party";
+        } else if (jRadioButton2.isSelected()) {
+            party = "Socks and Crocs Reform League";
+        } else if (jRadioButton3.isSelected()) {
+            party = "Pronounced Jiff Union";
+        }
+        
+        boolean temp = false;
+        for (String vote : firstName) {
+            if (name.equals(vote) && surName.equals(lastName.get(firstName.indexOf(vote)))) {
+                temp = true;
+            }
+        }
+        
+        if (!name.equals("") && !surName.equals("") && !party.equals("") && !temp) {
+            firstName.add(name);
+            lastName.add(surName);
+            partyName.add(party);
+            votersList.add((votersList.size() + 1) + ". " + name + " " + surName + " (" + party + ")\n");
+            jErrorMessageText.setText("(Vote added succesfully)");
+            profile.UpdateTexts();
+        } else {
+            jErrorMessageText.setText("(Error - vote could not be added)");
+        }
+    }//GEN-LAST:event_jAddButtonActionPerformed
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(UserInterface.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(UserInterface.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(UserInterface.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(UserInterface.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                profile.setVisible(true);
+                profile.ReadData();
+            }
+        });
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JButton jAddButton;
+    private javax.swing.JLabel jAddText1;
+    private javax.swing.JLabel jAddText2;
+    private javax.swing.JLabel jAddText3;
+    private javax.swing.JTextField jAddTextField1;
+    private javax.swing.JTextField jAddTextField2;
+    private javax.swing.JLabel jCreateVoteText;
+    private javax.swing.JLabel jErrorMessageText;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JRadioButton jRadioButton1;
+    private javax.swing.JRadioButton jRadioButton2;
+    private javax.swing.JRadioButton jRadioButton3;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JLabel jStandingsPosition1;
+    private javax.swing.JLabel jStandingsPosition2;
+    private javax.swing.JLabel jStandingsPosition3;
+    private javax.swing.JTextArea jTextArea2;
+    private java.awt.Label label1;
+    // End of variables declaration//GEN-END:variables
+}

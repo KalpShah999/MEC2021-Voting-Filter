@@ -15,14 +15,17 @@ public class UserInterface extends JFrame {
 
     static UserInterface profile = new UserInterface();
     
+    private ArrayList<String> initialFirstNames = new ArrayList();
+    private ArrayList<String> initialLastNames = new ArrayList();
+    private ArrayList<String> initialPartyNames = new ArrayList();
+    
     private ArrayList<String> firstName = new ArrayList();
     private ArrayList<String> lastName = new ArrayList();
     private ArrayList<String> partyName = new ArrayList();
     private ArrayList<String> votersList = new ArrayList();
     
-    private int party1Count = 0; //Pineapple Pizza Party
-    private int party2Count = 0; //Socks and Crocs Reform League
-    private int party3Count = 0; //Pronounced Jiff Union
+    private ArrayList<Integer> partyCounts = new ArrayList();
+    private ArrayList<String> partyNamesList = new ArrayList();
     
     private void ReadData() {
         //https://docs.oracle.com/javase/tutorial/essential/io/index.html
@@ -32,72 +35,76 @@ public class UserInterface extends JFrame {
         try (InputStream in = Files.newInputStream(file);
                 BufferedReader reader
                 = new BufferedReader(new InputStreamReader(in))) {
-            String line;
-            while ((line = reader.readLine()) != null && (line = reader.readLine()) != "First Name, Last Name, Vote") {
-                String[] Vote = line.split(",");
-                if (Vote.length == 3) {
-                    if (Vote[2].equals("Pineapple Pizza Party")) {
-                        party1Count++;
-                        firstName.add(Vote[0]);
-                        lastName.add(Vote[1]);
-                        partyName.add(Vote[2]);
-                        votersList.add((votersList.size() + 1) + ". " + Vote[0] + " " + Vote[1] + " (" + Vote[2] + ")\n");
-                    } else if (Vote[2].equals("Socks and Crocs Reform League")) {
-                        party2Count++;
-                        firstName.add(Vote[0]);
-                        lastName.add(Vote[1]);
-                        partyName.add(Vote[2]);
-                        votersList.add((votersList.size() + 1) + ". " + Vote[0] + " " + Vote[1] + " (" + Vote[2] + ")\n");
-                    } else if (Vote[2].equals("Pronounced Jiff Union")) {
-                        party3Count++;
-                        firstName.add(Vote[0]);
-                        lastName.add(Vote[1]);
-                        partyName.add(Vote[2]);
-                        votersList.add((votersList.size() + 1) + ". " + Vote[0] + " " + Vote[1] + " (" + Vote[2] + ")\n");
+            String line = reader.readLine();
+            while (line != null) {
+                if (!line.equals("First Name,Last Name,Vote")) {
+                    String[] Vote = line.split(",");
+                    if (Vote.length == 3) {
+                        initialFirstNames.add(Vote[0]);
+                        initialLastNames.add(Vote[1]);
+                        initialPartyNames.add(Vote[2]);
                     }
                 }
+                line = reader.readLine();
             }
         } catch (IOException x) {
             System.err.println(x);
+        }
+        
+        for (int i = 0; i < initialFirstNames.size(); i++) {
+            profile.AddVote(initialFirstNames.get(i), initialLastNames.get(i), initialPartyNames.get(i), i);
         }
         profile.UpdateTexts();
     }
     
     private void UpdateTexts() {
+        jTextArea1.setText("");
+        jTextArea2.setText("");
+        
         jLabel2.setText("Filtered List of Voters");
         for (String vote : votersList) {
             jTextArea2.append(vote);
         }
         
-        if (party1Count > party2Count && party1Count > party3Count) {
-            jStandingsPosition1.setText("Pineapple Pizza Party: " + party1Count);
-            if (party2Count > party3Count) {
-                jStandingsPosition2.setText("Socks and Crocs Reform League: " + party2Count);
-                jStandingsPosition3.setText("Pronounced Jiff Union: " + party3Count);
-            } else {
-                jStandingsPosition2.setText("Pronounced Jiff Union: " + party3Count);
-                jStandingsPosition3.setText("Socks and Crocs Reform League: " + party2Count);
-            }
-        } else if (party2Count > party3Count) {
-            jStandingsPosition1.setText("Socks and Crocs Reform League: " + party2Count);
-            if (party1Count > party3Count) {
-                jStandingsPosition2.setText("Pineapple Pizza Party: " + party1Count);
-                jStandingsPosition3.setText("Pronounced Jiff Union: " + party3Count);
-            } else {
-                jStandingsPosition2.setText("Pronounced Jiff Union: " + party3Count);
-                jStandingsPosition3.setText("Pineapple Pizza Party: " + party1Count);
-            }
-        } else {
-            jStandingsPosition1.setText("Pronounced Jiff Union: " + party3Count);
-            if (party1Count > party2Count) {
-                jStandingsPosition2.setText("Pineapple Pizza Party: " + party1Count);
-                jStandingsPosition3.setText("Socks and Crocs Reform League: " + party2Count);
-            } else {
-                jStandingsPosition2.setText("Socks and Crocs Reform League: " + party2Count);
-                jStandingsPosition3.setText("Pineapple Pizza Party: " + party1Count);
-            }
+        for (String vote : partyNamesList) {
+            jTextArea1.append(vote + ": " + partyCounts.get(partyNamesList.indexOf(vote)) + "\n");
         }
     }  
+    
+    private boolean AddVote(String newName, String newSurName, String newPartyName, int index) {
+        boolean temp1 = false;
+        for (int i = 0; i < initialFirstNames.size(); i++) {
+            if (i != index) {
+                if (newName.equals(initialFirstNames.get(i)) && newSurName.equals(initialLastNames.get(i))) {
+                    temp1 = true;
+                }
+            }
+        }
+        
+        if (!temp1) {
+            boolean temp2 = false;
+            if (!partyNamesList.isEmpty()) {
+                for (String party : partyNamesList) {
+                    if (newPartyName.equals(party)) {
+                        temp2 = true;
+                    }
+                }
+            }
+
+            if (!temp2) {
+                partyNamesList.add(newPartyName);
+                partyCounts.add(0);
+            }
+            partyCounts.set(partyNamesList.indexOf(newPartyName), partyCounts.get(partyNamesList.indexOf(newPartyName)) + 1);
+            firstName.add(newName);
+            lastName.add(newSurName);
+            partyName.add(newPartyName);
+            votersList.add((votersList.size() + 1) + ". " + newName + " " + newSurName + " (" + newPartyName + ")\n");
+        } else {
+            return false;
+        }
+        return true;
+    }
     
     public UserInterface() {
         initComponents();
@@ -118,9 +125,6 @@ public class UserInterface extends JFrame {
         jTextArea2 = new javax.swing.JTextArea();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
-        jStandingsPosition1 = new javax.swing.JLabel();
-        jStandingsPosition2 = new javax.swing.JLabel();
-        jStandingsPosition3 = new javax.swing.JLabel();
         jAddButton = new javax.swing.JButton();
         jAddTextField1 = new javax.swing.JTextField();
         jAddText1 = new javax.swing.JLabel();
@@ -132,6 +136,10 @@ public class UserInterface extends JFrame {
         jRadioButton3 = new javax.swing.JRadioButton();
         jCreateVoteText = new javax.swing.JLabel();
         jErrorMessageText = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTextArea1 = new javax.swing.JTextArea();
+        jRadioButton4 = new javax.swing.JRadioButton();
+        jTextFieldOther = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setResizable(false);
@@ -149,13 +157,6 @@ public class UserInterface extends JFrame {
 
         jLabel3.setFont(new java.awt.Font("Lucida Grande", 0, 18)); // NOI18N
         jLabel3.setText("Current Elections Standings:");
-
-        jStandingsPosition1.setFont(new java.awt.Font("Lucida Grande", 1, 13)); // NOI18N
-        jStandingsPosition1.setText("[Party Name]: [Vote Count]");
-
-        jStandingsPosition2.setText("[Party Name]: [Vote Count]");
-
-        jStandingsPosition3.setText("[Party Name]: [Vote Count]");
 
         jAddButton.setText("Add Vote");
         jAddButton.addActionListener(new java.awt.event.ActionListener() {
@@ -184,16 +185,28 @@ public class UserInterface extends JFrame {
 
         jErrorMessageText.setFont(new java.awt.Font("Lucida Grande", 0, 10)); // NOI18N
 
+        jTextArea1.setColumns(20);
+        jTextArea1.setRows(5);
+        jScrollPane1.setViewportView(jTextArea1);
+
+        buttonGroup1.add(jRadioButton4);
+        jRadioButton4.setText("Other");
+        jRadioButton4.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                jRadioButton4ItemStateChanged(evt);
+            }
+        });
+
+        jTextFieldOther.setEnabled(false);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(label1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(11, 11, 11)
+                        .addGap(21, 21, 21)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jAddText1)
@@ -203,32 +216,39 @@ public class UserInterface extends JFrame {
                                 .addComponent(jAddText2)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jAddTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jAddText3)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jRadioButton1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jRadioButton2)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jRadioButton3))
-                            .addComponent(jLabel3)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jAddButton)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jErrorMessageText))
+                            .addComponent(jAddText3)
+                            .addComponent(jCreateVoteText)
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(6, 6, 6)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jStandingsPosition2)
-                                    .addComponent(jStandingsPosition1)
-                                    .addComponent(jStandingsPosition3)))
-                            .addComponent(jCreateVoteText)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(10, 10, 10)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel2)
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 500, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(21, Short.MAX_VALUE))
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(jRadioButton3)
+                                            .addComponent(jRadioButton1))
+                                        .addGap(18, 18, 18)
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(jRadioButton2)
+                                            .addGroup(layout.createSequentialGroup()
+                                                .addComponent(jRadioButton4)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(jTextFieldOther, javax.swing.GroupLayout.PREFERRED_SIZE, 233, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(jAddButton)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jErrorMessageText, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                            .addGap(20, 20, 20)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(jLabel2)
+                                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 500, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(label1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGroup(layout.createSequentialGroup()
+                            .addContainerGap()
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(jLabel3)
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 500, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                .addContainerGap(15, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -248,24 +268,25 @@ public class UserInterface extends JFrame {
                     .addComponent(jAddText2)
                     .addComponent(jAddTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jAddText3)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jRadioButton1)
-                    .addComponent(jAddText3)
-                    .addComponent(jRadioButton2)
-                    .addComponent(jRadioButton3))
+                    .addComponent(jRadioButton2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jRadioButton3)
+                    .addComponent(jRadioButton4)
+                    .addComponent(jTextFieldOther, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jAddButton)
-                    .addComponent(jErrorMessageText))
-                .addGap(24, 24, 24)
+                    .addComponent(jErrorMessageText, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jStandingsPosition1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jStandingsPosition2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jStandingsPosition3)
-                .addContainerGap(27, Short.MAX_VALUE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(15, Short.MAX_VALUE))
         );
 
         label1.getAccessibleContext().setAccessibleName("title1");
@@ -283,26 +304,41 @@ public class UserInterface extends JFrame {
             party = "Socks and Crocs Reform League";
         } else if (jRadioButton3.isSelected()) {
             party = "Pronounced Jiff Union";
+        } else if (jRadioButton4.isSelected()) {
+            party = jTextFieldOther.getText();
         }
         
         boolean temp = false;
-        for (String vote : firstName) {
-            if (name.equals(vote) && surName.equals(lastName.get(firstName.indexOf(vote)))) {
-                temp = true;
+        if (party.replaceAll("\\s","").equals("")) {
+            temp = true;
+        } else {
+            for (String vote : firstName) {
+                if (name.equals(vote) && surName.equals(lastName.get(firstName.indexOf(vote)))) {
+                    temp = true;
+                }
             }
         }
         
         if (!name.equals("") && !surName.equals("") && !party.equals("") && !temp) {
-            firstName.add(name);
-            lastName.add(surName);
-            partyName.add(party);
-            votersList.add((votersList.size() + 1) + ". " + name + " " + surName + " (" + party + ")\n");
-            jErrorMessageText.setText("(Vote added succesfully)");
-            profile.UpdateTexts();
+            temp = profile.AddVote(name, surName, party, -1);
+            if (temp) {
+                jErrorMessageText.setText("(Vote added succesfully)");
+                profile.UpdateTexts();
+            } else {
+                jErrorMessageText.setText("(Error - vote could not be added)");
+            }
         } else {
             jErrorMessageText.setText("(Error - vote could not be added)");
         }
     }//GEN-LAST:event_jAddButtonActionPerformed
+
+    private void jRadioButton4ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jRadioButton4ItemStateChanged
+        if (jRadioButton4.isSelected()) {
+            jTextFieldOther.setEnabled(true);
+        } else {
+            jTextFieldOther.setEnabled(false);
+        }
+    }//GEN-LAST:event_jRadioButton4ItemStateChanged
 
     /**
      * @param args the command line arguments
@@ -355,11 +391,12 @@ public class UserInterface extends JFrame {
     private javax.swing.JRadioButton jRadioButton1;
     private javax.swing.JRadioButton jRadioButton2;
     private javax.swing.JRadioButton jRadioButton3;
+    private javax.swing.JRadioButton jRadioButton4;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JLabel jStandingsPosition1;
-    private javax.swing.JLabel jStandingsPosition2;
-    private javax.swing.JLabel jStandingsPosition3;
+    private javax.swing.JTextArea jTextArea1;
     private javax.swing.JTextArea jTextArea2;
+    private javax.swing.JTextField jTextFieldOther;
     private java.awt.Label label1;
     // End of variables declaration//GEN-END:variables
 }

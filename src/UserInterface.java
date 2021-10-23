@@ -320,7 +320,7 @@ public class UserInterface extends JFrame {
         if (!name.equals("") && !surName.equals("") && !party.equals("") && !temp) {
             temp = profile.AddVote(name, surName, party, -1);
             if (temp) {
-                jErrorMessageText.setText("(Vote added succesfully)");
+                jErrorMessageText.setText("(Vote added successfully)");
                 profile.UpdateTexts(true);
             } else {
                 jErrorMessageText.setText("(Error - vote could not be added)");
